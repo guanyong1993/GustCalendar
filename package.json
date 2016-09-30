@@ -1,0 +1,13 @@
+{
+  "name": "GustCalendar",
+  "version": "1.0.0",
+  "description": "A full browser compatible form calendar control solution",
+  "keywords": [
+    "gustcalendar",
+    "gust",
+    "calendar",
+    "Custom calendar"
+  ],
+  "author": "GuanYong",
+  "homepage": "https://github.com/guanyong1993/"
+}
