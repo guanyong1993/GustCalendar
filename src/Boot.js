@@ -542,4 +542,20 @@ var GustCalendar = function (dom) {
         }
         drawCld(year, month - 1);
     };
+
+	/**
+     * 获取当前日历所在年份
+     * @returns {number} 年份
+     */
+    this.getYear = function () {
+        return currentYear;
+    };
+
+	/**
+	 * 获取当前日历所在月份
+     * @returns {number} 月份
+     */
+    this.getMonth = function () {
+        return currentMonth;
+    };
 };
