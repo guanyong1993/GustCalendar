@@ -12,7 +12,7 @@
  * @param [maxDate] {String} 最大日期 ("yyyy-MM-dd")
  */
 var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
-    var lunarInfo, solarMonth, animals, solarTerm, sTermInfo, nStr1, nStr2, sFtv, lFtv, currentMonth = 0, currentYear = 0, currentTime = 0, gridsDom, toggleDom;
+    var lunarInfo, solarMonth, animals, solarTerm, sTermInfo, nStr1, nStr2, sFtv, lFtv, currentMonth = 0, currentYear = 0, currentTime = 0, gridsDom, toggleDom, self = this;
     var parseIntInArray = function (arr) {
         var ret = [];
         for (var i = 0; i < arr.length; i++) {
@@ -249,6 +249,8 @@ var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
                 dom.find('.date-grid[data-value="' + currentTime.date + '"]').addClass('active');
             }
         }
+
+        self.onChange(currentYear, currentMonth + 1);
     };
 
     var tY = new Date().getFullYear(), tM = new Date().getMonth(), tD = new Date().getDate();
@@ -445,7 +447,6 @@ var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
         builderDateGrid();
         drawCld(tY, tM);
 
-        var self = this;
         dom.find(".console .year .prev-btn").click(function () {
             self.prevYear();
         });
@@ -469,7 +470,6 @@ var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
     this.enableFormControl = function (className) {
         toggleDom = dom;
         dom = null;
-        var self = this;
         var isOpen = false;
 
         startListener = function () {
@@ -518,8 +518,8 @@ var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
                         var m = currentMonth + 1;
                         var d = $(this).find('.sd').html();
                         toggleDom.val(currentYear + '-' + (m < 10 ? '0' + m : m) + '-' + (d < 10 ? '0' + d: d));
-                        if (typeof self.onChange == 'function') {
-                            self.onChange(currentYear, m, d);
+                        if (typeof self.onChoose == 'function') {
+                            self.onChoose(currentYear, m, d);
                         }
                     }
                 });
@@ -592,8 +592,8 @@ var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
 
     this.gotoDate = function (year, month, date) {
         gotoDate(year, month, date);
-        if (typeof this.onChange == "function") {
-            this.onChange(year, month, date);
+        if (typeof this.onChoose == "function") {
+            this.onChoose(year, month, date);
         }
     };
 
@@ -614,10 +614,17 @@ var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
     };
 
     /**
-     * 当日历发生变更时触发
+     * 当日历年份或月份发生变更时触发
+     * @param year {Number} 年
+     * @param month {Number} 月
+     */
+    this.onChange = function (year, month) { };
+
+    /**
+     * 当日期被选中后触发
      * @param year {Number} 年
      * @param month {Number} 月
      * @param date {Number} 日
      */
-    this.onChange = function (year, month, date) { };
+    this.onChoose = function (year, month, date) { };
 };
