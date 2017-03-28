@@ -124,6 +124,9 @@
 #__gust_calender_container .grids .date-grid-row .date-grid.disable .sd{
     color: #dddddd;
 }
+#__gust_calender_container .grids .date-grid-row .date-grid.disable .ld{
+    color: #dddddd;
+}
 #__gust_calender_container .grids .date-grid-row .date-grid.disable:hover{
     background-color: transparent;
     color: #dddddd;

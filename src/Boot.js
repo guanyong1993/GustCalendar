@@ -6,9 +6,24 @@
  * 日历控件
  * @constructor GustCalendar
  * @param dom {Object} 需要显示日历的文档对象(jQuery元素)
+ * @param [minDate] {String} 最小日期 ("yyyy-MM-dd")
+ * @param [maxDate] {String} 最大日期 ("yyyy-MM-dd")
  */
-var GustCalendar = function (dom) {
+var GustCalendar = function (dom, minDate, maxDate) {
     var lunarInfo, solarMonth, animals, solarTerm, sTermInfo, nStr1, nStr2, sFtv, lFtv, currentMonth = 0, currentYear = 0, currentTime = 0, gridsDom, toggleDom;
+    var parseIntInArray = function (arr) {
+        var ret = [];
+        for (var i = 0; i < arr.length; i++) {
+            ret[i] = parseInt(arr[i], 10);
+        }
+        return ret;
+    };
+    if (null != minDate) {
+        minDate = parseIntInArray(minDate.split('-'));
+    }
+    if (null != maxDate) {
+        maxDate = parseIntInArray(maxDate.split('-'));
+    }
 
     (function () {
         lunarInfo = [0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2, 0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977,
@@ -102,13 +117,30 @@ var GustCalendar = function (dom) {
         var i, sD, s;
         cld = calendar(SY, SM);
         var sx = animals[(SY - 4) % 12];    //生肖
+        var isLtMinDate = false, isSameMinMonth = false, isGtMaxDate = false, isSameMaxMonth = false;
+        if (null != minDate) {
+            var minY = minDate[0], minM = minDate[1];
+            isLtMinDate = (SY < minY) || (SY == minY && SM + 1 < minM);
+            isSameMinMonth = (SY == minY) && (SM + 1 == minM);
+        }
+        if (null != maxDate) {
+            var maxY = maxDate[0], maxM = maxDate[1];
+            isGtMaxDate = (SY > maxY) || (SY == maxY && SM + 1 > maxM);
+            isSameMaxMonth = (SY == maxY) && (SM + 1 == maxM);
+        }
+
         for (i = 0; i < 42; i++) {
             var gObj = gridsDom.find('#GD' + i);
             var sObj = gridsDom.find('#SD' + i)[0];
             var lObj = gridsDom.find('#LD' + i)[0];
             sD = i - cld.firstWeek;
             if (sD > -1 && sD < cld.length) { //日期内
-                gObj.removeClass("disable");
+                if ((isLtMinDate || (isSameMinMonth && (sD + 1) < minDate[2])) || (isGtMaxDate || (isSameMaxMonth && (sD + 1) > maxDate[2]))) {
+                    gObj.addClass("disable");
+                } else {
+                    gObj.removeClass("disable");
+                }
+
                 sObj.innerHTML = sD + 1;
                 gObj.attr('data-value', sD + 1);
                 if (cld[sD].isToday) {
