@@ -6,10 +6,12 @@
  * 日历控件
  * @constructor GustCalendar
  * @param dom {Object} 需要显示日历的文档对象(jQuery元素)
+ * @param yearFormat {String} 年份显示格式('yyyy年' -> '2017年')
+ * @param monthFormat {String} 月份显示格式('MM月' -> '3月' ,  '@M月' -> '三月')
  * @param [minDate] {String} 最小日期 ("yyyy-MM-dd")
  * @param [maxDate] {String} 最大日期 ("yyyy-MM-dd")
  */
-var GustCalendar = function (dom, minDate, maxDate) {
+var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
     var lunarInfo, solarMonth, animals, solarTerm, sTermInfo, nStr1, nStr2, sFtv, lFtv, currentMonth = 0, currentYear = 0, currentTime = 0, gridsDom, toggleDom;
     var parseIntInArray = function (arr) {
         var ret = [];
@@ -108,11 +110,16 @@ var GustCalendar = function (dom, minDate, maxDate) {
 
     var cld;
 
+    var getCNMonth = function (month) {
+        var arr = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"];
+        return arr[month - 1];
+    };
+
     var drawCld = function (SY, SM) {
         currentYear = SY;
         currentMonth = SM;
-        dom.find(".console .year .label").text(SY + "年");
-        dom.find(".console .month .label").text((SM + 1) + "月");
+        dom.find(".console .year .label").text(yearFormat ? (yearFormat.replace('yyyy', SY)) : (SY + '年'));
+        dom.find(".console .month .label").text(monthFormat ? (monthFormat.replace('@M', getCNMonth(SM + 1)).replace('MM', SM)) : ((SM + 1) + '月'));
 
         var i, sD, s;
         cld = calendar(SY, SM);
@@ -459,8 +466,9 @@ var GustCalendar = function (dom, minDate, maxDate) {
     /**
      * 初始化为表单控件
      */
-    this.enableFormControl = function () {
+    this.enableFormControl = function (className) {
         toggleDom = dom;
+        dom = null;
         var self = this;
         var isOpen = false;
 
@@ -479,13 +487,13 @@ var GustCalendar = function (dom, minDate, maxDate) {
                 }
                 var positionStyle = 'left: ' + x + 'px; ' +
                     'top: ' + y + 'px;';
-                dom = $('<div id="__gust_calender_container" style="' + positionStyle + '"></div>').appendTo('body');
+                dom = $('<div id="__gust_calender_container" class="' + (className ? className : '') + '" style="' + positionStyle + '"></div>').appendTo('body');
                 self.enableView();
 
                 if ('' != toggleDom.val()) {
                     var dateFormats = toggleDom.val().split('-');
                     if (dateFormats.length >= 3) {
-                        self.gotoDate(parseInt(dateFormats[0]), parseInt(dateFormats[1]), parseInt(dateFormats[2]));
+                        gotoDate(parseInt(dateFormats[0]), parseInt(dateFormats[1]), parseInt(dateFormats[2]));
                     }
                 }
 
@@ -510,6 +518,9 @@ var GustCalendar = function (dom, minDate, maxDate) {
                         var m = currentMonth + 1;
                         var d = $(this).find('.sd').html();
                         toggleDom.val(currentYear + '-' + (m < 10 ? '0' + m : m) + '-' + (d < 10 ? '0' + d: d));
+                        if (typeof self.onChange == 'function') {
+                            self.onChange(currentYear, m, d);
+                        }
                     }
                 });
             }
@@ -518,7 +529,9 @@ var GustCalendar = function (dom, minDate, maxDate) {
     };
     
     this.destroy = function () {
-        dom.empty();
+        if (null != dom) {
+            dom.empty();
+        }
         if (null != toggleDom) {
             toggleDom[0].removeEventListener('click', startListener, true);
 
@@ -568,11 +581,20 @@ var GustCalendar = function (dom, minDate, maxDate) {
         }
     };
 
-    this.gotoDate = function (year, month, date) {
+    var gotoDate = function (year, month, date) {
         if (null != date) {
             currentTime = {year: year, month: month - 1, date: date};
         }
-        drawCld(year, month - 1);
+        if ($('#__gust_calender_container').length > 0) {
+            drawCld(year, month - 1);
+        }
+    };
+
+    this.gotoDate = function (year, month, date) {
+        gotoDate(year, month, date);
+        if (typeof this.onChange == "function") {
+            this.onChange(year, month, date);
+        }
     };
 
 	/**
@@ -590,4 +612,12 @@ var GustCalendar = function (dom, minDate, maxDate) {
     this.getMonth = function () {
         return currentMonth;
     };
+
+    /**
+     * 当日历发生变更时触发
+     * @param year {Number} 年
+     * @param month {Number} 月
+     * @param date {Number} 日
+     */
+    this.onChange = function (year, month, date) { };
 };
