@@ -119,7 +119,7 @@ var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
         currentYear = SY;
         currentMonth = SM;
         dom.find(".console .year .label").text(yearFormat ? (yearFormat.replace('yyyy', SY)) : (SY + '年'));
-        dom.find(".console .month .label").text(monthFormat ? (monthFormat.replace('@M', getCNMonth(SM + 1)).replace('MM', SM)) : ((SM + 1) + '月'));
+        dom.find(".console .month .label").text(monthFormat ? (monthFormat.replace('@M', getCNMonth(SM + 1)).replace('MM', SM + 1)) : ((SM + 1) + '月'));
 
         var i, sD, s;
         cld = calendar(SY, SM);
