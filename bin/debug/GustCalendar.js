@@ -10,9 +10,11 @@
  * @param monthFormat {String} 月份显示格式('MM月' -> '3月' ,  '@M月' -> '三月')
  * @param [minDate] {String} 最小日期 ("yyyy-MM-dd")
  * @param [maxDate] {String} 最大日期 ("yyyy-MM-dd")
+ * @param [startWeek] {Number} 日历第一列显示的星期, 值分别为 0 - 6 的数字, 其中 0 表示周末
  */
-var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
+var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate, startWeek) {
     var lunarInfo, solarMonth, animals, solarTerm, sTermInfo, nStr1, nStr2, sFtv, lFtv, currentMonth = 0, currentYear = 0, currentTime = 0, gridsDom, toggleDom, self = this;
+    startWeek = startWeek ? startWeek : 0;
     var parseIntInArray = function (arr) {
         var ret = [];
         for (var i = 0; i < arr.length; i++) {
@@ -140,7 +142,12 @@ var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
             var gObj = gridsDom.find('#GD' + i);
             var sObj = gridsDom.find('#SD' + i)[0];
             var lObj = gridsDom.find('#LD' + i)[0];
-            sD = i - cld.firstWeek;
+            var firstWeek = cld.firstWeek - startWeek;
+            if (firstWeek < 0) {
+                firstWeek = 5 - firstWeek;
+            }
+            sD = i - firstWeek;
+            console.log('cld.firstWeek ' + cld.firstWeek);
             if (sD > -1 && sD < cld.length) { //日期内
                 if ((isLtMinDate || (isSameMinMonth && (sD + 1) < minDate[2])) || (isGtMaxDate || (isSameMaxMonth && (sD + 1) > maxDate[2]))) {
                     gObj.addClass("disable");
@@ -429,15 +436,18 @@ var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate) {
                 '</div>' +
             '</div>';
 
-        var week = '<div class="week">' +
-                '<div class="label">日</div>' +
-                '<div class="label">一</div>' +
-                '<div class="label">二</div>' +
-                '<div class="label">三</div>' +
-                '<div class="label">四</div>' +
-                '<div class="label">五</div>' +
-                '<div class="label">六</div>' +
-            '</div>';
+        var weekText = ['日', '一', '二', '三', '四', '五', '六'];
+        var weekHtml = '';
+        for (var i = 0; i < weekText.length; i++) {
+            var index = i + startWeek;
+            var text = weekText[index];
+            if (index >= weekText.length) {
+                text = weekText[index - 7];
+            }
+            weekHtml += '<div class="label">' + text + '</div>';
+        }
+
+        var week = '<div class="week">' + weekHtml + '</div>';
 
         var content = '<div class="grids"></div>';
 
