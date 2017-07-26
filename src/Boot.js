@@ -147,7 +147,6 @@ var GustCalendar = function (dom, yearFormat, monthFormat, minDate, maxDate, sta
                 firstWeek = 5 - firstWeek;
             }
             sD = i - firstWeek;
-            console.log('cld.firstWeek ' + cld.firstWeek);
             if (sD > -1 && sD < cld.length) { //日期内
                 if ((isLtMinDate || (isSameMinMonth && (sD + 1) < minDate[2])) || (isGtMaxDate || (isSameMaxMonth && (sD + 1) > maxDate[2]))) {
                     gObj.addClass("disable");
